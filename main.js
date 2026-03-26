@@ -125,10 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
     bookingForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      const nameField    = bookingForm.querySelector('[name="name"]');
+      const nameField    = bookingForm.querySelector('[name="full_name"]');
       const phoneField   = bookingForm.querySelector('[name="phone"]');
       const emailField   = bookingForm.querySelector('[name="email"]');
-      const addressField = bookingForm.querySelector('[name="address"]');
+      const addressField = bookingForm.querySelector('[name="service_address"]');
 
       let valid = true;
 
@@ -174,11 +174,26 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (valid) {
-        const successMsg = document.createElement('div');
-        successMsg.className = 'form-success';
-        successMsg.textContent = "Thanks! We'll be in touch shortly.";
-        bookingForm.insertAdjacentElement('afterend', successMsg);
-        bookingForm.style.display = 'none';
+        // Submit to Netlify via fetch, then show success message
+        fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(new FormData(bookingForm)).toString()
+        })
+          .then(() => {
+            const successMsg = document.createElement('div');
+            successMsg.className = 'form-success';
+            successMsg.textContent = "Thanks! We'll be in touch shortly.";
+            bookingForm.insertAdjacentElement('afterend', successMsg);
+            bookingForm.style.display = 'none';
+          })
+          .catch(() => {
+            const errMsg = document.createElement('div');
+            errMsg.className = 'form-success';
+            errMsg.style.borderColor = '#e53e3e';
+            errMsg.textContent = "Something went wrong. Please call us at (615) 856-7940.";
+            bookingForm.insertAdjacentElement('afterend', errMsg);
+          });
       }
     });
   }
